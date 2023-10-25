@@ -22,14 +22,22 @@ public:
     bool separatingPlanes();
     bool inflateRegion(double& volume);
     HyperPlane tangentPlane(const Vector& point, const Matrix& Civn2);
-    Region& getRegion() {return region_;}
-    Polyhedron& getPolyhedron() {return region_.getPolyhedron();}
-    Ellipsoid& getEllipsoid() {return region_.getEllipsoid();}
-    PlaneMatrix& getA() {return region_.getPolyhedron().getA();}
-    PlaneVector& getB() {return region_.getPolyhedron().getB();}
-    Matrix& getC() {return region_.getEllipsoid().getC();}
-    Vector& getD() {return region_.getEllipsoid().getD();}
-    
+
+    const Region& getRegion() const {return region_;}
+    Polyhedron& getPolyhedronRef() {return region_.getPolyhedronRef();}
+    Ellipsoid& getEllipsoidRef() {return region_.getEllipsoidRef();}
+    PlaneMatrix& getARef() {return region_.getPolyhedronRef().getARef();}
+    PlaneVector& getBRef() {return region_.getPolyhedronRef().getBRef();}
+    Matrix& getCRef() {return region_.getEllipsoidRef().getCRef();}
+    Vector& getDRef() {return region_.getEllipsoidRef().getDRef();}
+
+    const Polyhedron& getPolyhedron() const {return region_.getPolyhedron();}
+    const Ellipsoid& getEllipsoid() const {return region_.getEllipsoid();}
+    const PlaneMatrix& getA() const {return region_.getPolyhedron().getA();}
+    const PlaneVector& getB() const {return region_.getPolyhedron().getB();}
+    const Matrix& getC() const {return region_.getEllipsoid().getC();}
+    const Vector& getD() const {return region_.getEllipsoid().getD();}
+
 private:
     std::vector<Obstacle> obs_;
     Region region_;

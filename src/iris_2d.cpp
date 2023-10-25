@@ -5,11 +5,11 @@ namespace iris_2d
 
 bool Problem::initialize(const Vector& seed, const std::vector<Obstacle>& obs)
 {
-    region_.getEllipsoid().setD(seed);
-    region_.getEllipsoid().getC().coeffRef(0,0) = ELLIPSOID_C_EPSILON;
-    region_.getEllipsoid().getC().coeffRef(1,0) = 0.0;
-    region_.getEllipsoid().getC().coeffRef(0,1) = 0.0;
-    region_.getEllipsoid().getC().coeffRef(1,1) = ELLIPSOID_C_EPSILON;
+    getEllipsoidRef().setD(seed);
+    getCRef().coeffRef(0,0) = ELLIPSOID_C_EPSILON;
+    getCRef().coeffRef(1,0) = 0.0;
+    getCRef().coeffRef(0,1) = 0.0;
+    getCRef().coeffRef(1,1) = ELLIPSOID_C_EPSILON;
 
     obs_ = obs;
 
@@ -80,8 +80,8 @@ bool Problem::separatingPlanes()
     // std::cout << "A: " << A_mat << std::endl;
     // std::cout << "b: " << b_vec << std::endl;
 
-    getPolyhedron().setA(A_mat);
-    getPolyhedron().setB(b_vec);
+    getPolyhedronRef().setA(A_mat);
+    getPolyhedronRef().setB(b_vec);
 
     return true;
 }
@@ -89,10 +89,10 @@ bool Problem::separatingPlanes()
 bool Problem::inflateRegion(double& volume)
 {
     if (!ie_solver_.solve(getA(), getB(), getC(), getD())) return false;
-    getEllipsoid().setC(ie_solver_.getC());
-    getEllipsoid().setD(ie_solver_.getD());
+    getEllipsoidRef().setC(ie_solver_.getC());
+    getEllipsoidRef().setD(ie_solver_.getD());
 
-    volume = getEllipsoid().getVolume();
+    volume = getEllipsoidRef().getVolume();
 
     // std::cout << "C: " << getC() << std::endl;
     // std::cout << "d: " << getD() << std::endl;

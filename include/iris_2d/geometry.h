@@ -26,8 +26,10 @@ public:
 
     void setA(const PlaneMatrix& A) {A_ = A;}
     void setB(const PlaneVector& b) {b_ = b;}
-    PlaneMatrix& getA() {return A_;}
-    PlaneVector& getB() {return b_;}
+    const PlaneMatrix& getA() const {return A_;}
+    const PlaneVector& getB() const {return b_;}
+    PlaneMatrix& getARef() {return A_;}
+    PlaneVector& getBRef() {return b_;}
 
 private:
     PlaneMatrix A_;
@@ -44,8 +46,11 @@ public:
 
     void setC(const Matrix& C) {C_ = C;}
     void setD(const Vector& d) {d_ = d;}
-    Matrix& getC() {return C_;}
-    Vector& getD() {return d_;}
+    const Matrix& getC() const {return C_;}
+    const Vector& getD() const {return d_;}
+
+    Matrix& getCRef() {return C_;}
+    Vector& getDRef() {return d_;}
     double getVolume() const {return C_.determinant();}
 private:
     Matrix C_;
@@ -58,8 +63,21 @@ public:
     Region() {}
     ~Region() {}
 
-    Polyhedron& getPolyhedron() {return polyhedron_;}
-    Ellipsoid& getEllipsoid() {return ellipsoids_;}
+    const Polyhedron& getPolyhedron() const {return polyhedron_;}
+    const Ellipsoid& getEllipsoid() const {return ellipsoids_;}
+    Polyhedron& getPolyhedronRef() {return polyhedron_;}
+    Ellipsoid& getEllipsoidRef() {return ellipsoids_;}
+
+    const PlaneMatrix& getA() const {return polyhedron_.getA();}
+    const PlaneVector& getB() const {return polyhedron_.getB();}
+    const Matrix& getC() const {return ellipsoids_.getC();}
+    const Vector& getD() const {return ellipsoids_.getD();}
+
+    PlaneMatrix& getARef() {return polyhedron_.getARef();}
+    PlaneVector& getBRef() {return polyhedron_.getBRef();}
+    Matrix& getCRef() {return ellipsoids_.getCRef();}
+    Vector& getDRef() {return ellipsoids_.getDRef();}
+
 private:
     Polyhedron polyhedron_;
     Ellipsoid ellipsoids_;
