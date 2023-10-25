@@ -12,7 +12,7 @@ using PlaneMatrix = Eigen::Matrix<double, -1, 2>;
 using Vector = Eigen::Vector2d;
 using PlaneVector = Eigen::VectorXd;
 using Obstacle = Eigen::Matrix<double, 2, -1>;
-using HyperPlane = std::pair<PlaneVector, double>;
+using HyperPlane = std::pair<Vector, double>;
 
 const double ELLIPSOID_C_EPSILON = 1e-4;
 

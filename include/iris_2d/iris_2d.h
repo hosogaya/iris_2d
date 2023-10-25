@@ -25,10 +25,10 @@ public:
     Region& getRegion() {return region_;}
     Polyhedron& getPolyhedron() {return region_.getPolyhedron();}
     Ellipsoid& getEllipsoid() {return region_.getEllipsoid();}
-    PlaneMatrix getA() {return region_.getPolyhedron().getA();}
-    PlaneVector getB() {return region_.getPolyhedron().getB();}
-    Matrix getC() {return region_.getEllipsoid().getC();}
-    Vector getD() {return region_.getEllipsoid().getD();}
+    PlaneMatrix& getA() {return region_.getPolyhedron().getA();}
+    PlaneVector& getB() {return region_.getPolyhedron().getB();}
+    Matrix& getC() {return region_.getEllipsoid().getC();}
+    Vector& getD() {return region_.getEllipsoid().getD();}
     
 private:
     std::vector<Obstacle> obs_;
