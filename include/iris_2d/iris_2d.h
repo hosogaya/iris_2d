@@ -4,6 +4,8 @@
 #include <iris_2d/ccp_solver.h>
 #include <iris_2d/ie_solver.h>
 #include <vector>
+#include <chrono>
+#include <numeric>
 
 namespace iris_2d
 {
@@ -40,6 +42,11 @@ public:
     const Matrix& getC() const {return region_.getEllipsoid().getC();}
     const Vector& getD() const {return region_.getEllipsoid().getD();}
 
+    double getIeTime() const {return mean_ie_time_;}
+    double getCcpTime() const {return mean_ccp_time_;}
+    int getIteration() const {return iter_;}
+
+    void setMaxIteration(const int iter) {max_iteration_ = iter;}
 private:
     std::vector<Obstacle> obs_;
     Region region_;
@@ -47,6 +54,18 @@ private:
     ie_solver::IeSovler ie_solver_;
 
     double best_vol_;
+    double mean_ie_time_;
+    double mean_ccp_time_;
+    int max_iteration_ = 20;
+    int iter_;
+
+    template <typename T>
+    std::vector<size_t> arg_sort(const std::vector<T> &vec) {
+        std::vector<size_t> idx(vec.size());
+        std::iota(idx.begin(), idx.end(), 0);
+        std::sort(idx.begin(), idx.end(), [&vec](size_t i0, size_t i1) {return vec[i0] < vec[i1];});
+        return idx;
+    }
 };
 
 }

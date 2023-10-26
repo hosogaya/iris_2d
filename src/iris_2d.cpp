@@ -10,6 +10,9 @@ void Problem::reset()
     getCRef().coeffRef(1,1) = ELLIPSOID_C_EPSILON;
 
     best_vol_ = std::pow(ELLIPSOID_C_EPSILON, 2.0);
+    mean_ie_time_ = 0;
+    mean_ccp_time_ = 0;
+    iter_ = 0;
 }
 
 void Problem::initialize(const Vector& seed, const std::vector<Obstacle>& obs)
@@ -23,13 +26,16 @@ void Problem::initialize(const Vector& seed, const std::vector<Obstacle>& obs)
 bool Problem::solve()
 {
     double volume = 0.0;
-    while (true)
+    int i=0;
+    for (; i<max_iteration_; ++i)
     {
         if (!separatingPlanes()) return false;
         if (!inflateRegion(volume)) return false;
         if (std::abs(volume - best_vol_)/best_vol_ < 2e-2) break;
         best_vol_ = volume;
+        ++iter_;
     }
+    if (i == max_iteration_) return false;
 
     return true;
 }
@@ -42,6 +48,7 @@ HyperPlane Problem::tangentPlane(const Vector& point, const Matrix& Cinv2)
 
 bool Problem::separatingPlanes()
 {
+    auto start = std::chrono::system_clock::now();
     Matrix Cinv = getC().inverse();
     Matrix Cinv2 = Cinv*Cinv.transpose();
     Polyhedron poly;
@@ -52,13 +59,38 @@ bool Problem::separatingPlanes()
         img_obs[i] = Cinv*(obs_[i].colwise() - getD()); 
     }
 
-    std::vector<HyperPlane> planes;
+    // std::vector<Vector> image_squared_dists(obs_.size());
+    // for (size_t i=0; i<obs_.size(); ++i) image_squared_dists[i] = img_obs[i].colwise().squaredNorm();
+
+    // std::vector<double> min_squared_dists(obs_.size());
+    // for (size_t i=0; i<obs_.size(); ++i) min_squared_dists[i] = image_squared_dists[i].minCoeff();
+
+    // std::vector<size_t> obs_sort_idx = arg_sort(min_squared_dists);
+
+    std::vector<HyperPlane> planes(0);
 
     for (size_t i=0; i<obs_.size(); ++i)
     {
-        if (!ccp_solver_.solve(img_obs[i])) return false;
-
-        Vector y_star = ccp_solver_.getX();
+        for (size_t j=0; j<planes.size(); ++j)
+        {
+            if (((planes[j].first.transpose()*obs_[i]).array() - planes[j].second > 0.0).all()) continue;
+        }
+        Vector y_star;
+        if (obs_[i].cols() == 2) 
+        {
+            // const Vector d = getD();
+            const Vector p0 = img_obs[i].col(0);
+            const Vector p1 = img_obs[i].col(1);
+            double alpha = (p1-p0).dot(-p0) / (p1-p0).norm();
+            if (alpha > 1.0) alpha = 1.0;
+            else if (alpha < 0.0) alpha = 0.0;
+            y_star = alpha* (p1-p0) + p0;
+        }
+        else 
+        {
+            if (!ccp_solver_.solve(img_obs[i])) return false;
+            y_star = ccp_solver_.getX();
+        }
         if (y_star.squaredNorm() < 1e-6)
         {
             return false;
@@ -84,12 +116,15 @@ bool Problem::separatingPlanes()
 
     getPolyhedronRef().setA(A_mat);
     getPolyhedronRef().setB(b_vec);
-
+    auto end = std::chrono::system_clock::now();
+    double elasped = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    mean_ccp_time_ = (iter_*mean_ccp_time_ + elasped)/(iter_+1);
     return true;
 }
 
 bool Problem::inflateRegion(double& volume)
 {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     if (!ie_solver_.solve(getA(), getB(), getC(), getD())) return false;
     getEllipsoidRef().setC(ie_solver_.getC());
     getEllipsoidRef().setD(ie_solver_.getD());
@@ -98,6 +133,10 @@ bool Problem::inflateRegion(double& volume)
 
     // std::cout << "C: " << getC() << std::endl;
     // std::cout << "d: " << getD() << std::endl;
+
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    double elasped = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    mean_ie_time_ = (iter_*mean_ie_time_ + elasped)/(iter_+1);
 
     return true;
 }

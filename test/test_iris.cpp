@@ -28,6 +28,9 @@ int main()
     std::cout << "d: " << problem.getD() << std::endl;
     std::cout << "A: " << problem.getA() << std::endl;
     std::cout << "b: " << problem.getB() << std::endl;
-
+    std::cout << "ccpTime: " << problem.getCcpTime() << std::endl;
+    std::cout << "ieTime: " << problem.getIeTime() << std::endl;
+    std::cout << "Iteratoin: " << problem.getIteration() << std::endl;
+    
     return 0;
 }

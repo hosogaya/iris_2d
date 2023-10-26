@@ -160,13 +160,13 @@ protected:
 };
 
 // cost function
-inline autodiff::real f_cost(const autodiff::Vector2real& eigen_value, const autodiff::real& eigen_vector, const autodiff::Vector2real& d) 
-{
-	// std::cout << "f const called" << std::endl;
-	// std::cout << "f const finished" << std::endl;
+// inline autodiff::real f_cost(const autodiff::Vector2real& eigen_value) 
+// {
+// 	// std::cout << "f const called" << std::endl;
+// 	// std::cout << "f const finished" << std::endl;
 
-	return -log(eigen_value[0]*eigen_value[1]);
-}
+// 	return -log(eigen_value[0]*eigen_value[1]);
+// }
 
 class Cost : public ifopt::CostTerm
 {
@@ -178,12 +178,12 @@ public:
 	{
 		// std::cout << "GetCost called" << std::endl;
 		Eigen::VectorXd x = GetVariables()->GetComponent("ie_vars")->GetValues();
-		autodiff::Vector2real eigen_value = x.topRows(2);
-		autodiff::real rad = x(2);
-		autodiff::Vector2real d = x.bottomRows(2);
+		// autodiff::Vector2real eigen_value = x.topRows(2);
+		// autodiff::real rad = x(2);
+		// autodiff::Vector2real d = x.bottomRows(2);
 		
 		// std::cout << "GetCost finished" << std::endl;
-		return f_cost(eigen_value, rad, d).val();
+		return -std::log(x(0)*x(1));
 	};
 
 	void FillJacobianBlock(std::string var_set, Jacobian& jac) const override
@@ -192,18 +192,17 @@ public:
 		if (var_set == "ie_vars")
 		{
 			Eigen::VectorXd x = GetVariables()->GetComponent("ie_vars")->GetValues();
-			autodiff::Vector2real eigen_value = x.topRows(2);
-			autodiff::real rad = x(2);
-			autodiff::Vector2real d = x.bottomRows(2);
+			// autodiff::Vector2real eigen_value = x.topRows(2);
+			// autodiff::real rad = x(2);
+			// autodiff::Vector2real d = x.bottomRows(2);
 
-			Eigen::VectorXd grad = autodiff::gradient(f_cost, autodiff::wrt(eigen_value, rad, d), autodiff::at(eigen_value, rad, d));
+			// Eigen::VectorXd grad = autodiff::gradient(f_cost, autodiff::wrt(eigen_value), autodiff::at(eigen_value));
 		
 			jac.resize(1, x.size());
+			jac.toDense().fill(0.0);
 
-			for (int i=0; i<grad.size(); ++i)
-			{
-				jac.coeffRef(0, i) = grad[i];
-			}
+			jac.coeffRef(0,0) =-1/x(0);
+			jac.coeffRef(0,1) =-1/x(1);
 		}
 		// std::cout << "FillJacobian for cost finished" << std::endl;
 	}
@@ -216,17 +215,17 @@ public:
 	IeSovler() 
 	{
 		ipopt_.SetOption("tol", 1.0e-4); // tolerance
-		ipopt_.SetOption("max_iter", int(100)); // max iteration
-		// ipopt_.SetOption("max_wall_time", 1e20); // maximum computation time
+		ipopt_.SetOption("max_iter", 50); // max iteration
+		ipopt_.SetOption("max_wall_time", 1); // maximum computation time
 		ipopt_.SetOption("constr_viol_tol", 0.001); // constraint violation tolerance
-		ipopt_.SetOption("print_level", 1); // supress log
+		ipopt_.SetOption("print_level", 4); // supress log
 
-		ipopt_.SetOption("dependency_detection_with_rhs", "yes"); // check constrains (yes) or only check gradients of constraints (no).
+		ipopt_.SetOption("dependency_detection_with_rhs", "no"); // check constrains (yes) or only check gradients of constraints (no).
 		ipopt_.SetOption("jacobian_approximation", "exact"); // how to compute jacobian
 		ipopt_.SetOption("gradient_approximation", "exact"); // how to compute gradient
 		ipopt_.SetOption("diverging_iterates_tol", 10.0e20); // Threshold of the number of primal iterations
 		ipopt_.SetOption("nlp_scaling_method", "gradient-based"); // how to solve nlp
-		ipopt_.SetOption("nlp_scaling_max_gradient", 2.0); // how to solve nlp
+		ipopt_.SetOption("nlp_scaling_max_gradient", 1000.0); // how to solve nlp
 		ipopt_.SetOption("sb", "yes");
 
 	}
