@@ -14,9 +14,11 @@ public:
     Problem() {}
     ~Problem() {}
 
-    bool initialize(const Vector& seed, const std::vector<Obstacle>& obs);
+    void reset();
+    void initialize(const Vector& seed, const std::vector<Obstacle>& obs);
     void addObstacle(const Obstacle& obs) {obs_.push_back(obs);}
     void setObstacle(const std::vector<Obstacle>& obs) {obs_ = obs;}
+    void setSeedPos(const Vector& seed) {getEllipsoidRef().setD(seed);}
     bool solve();
 
     bool separatingPlanes();

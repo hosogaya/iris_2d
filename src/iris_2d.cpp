@@ -2,20 +2,22 @@
 
 namespace iris_2d
 {
-
-bool Problem::initialize(const Vector& seed, const std::vector<Obstacle>& obs)
+void Problem::reset()
 {
-    getEllipsoidRef().setD(seed);
     getCRef().coeffRef(0,0) = ELLIPSOID_C_EPSILON;
     getCRef().coeffRef(1,0) = 0.0;
     getCRef().coeffRef(0,1) = 0.0;
     getCRef().coeffRef(1,1) = ELLIPSOID_C_EPSILON;
 
+    best_vol_ = std::pow(ELLIPSOID_C_EPSILON, 2.0);
+}
+
+void Problem::initialize(const Vector& seed, const std::vector<Obstacle>& obs)
+{
+    getEllipsoidRef().setD(seed);
     obs_ = obs;
 
-    best_vol_ = std::pow(ELLIPSOID_C_EPSILON, 2.0);
-
-    return true;
+    reset();
 }
 
 bool Problem::solve()
