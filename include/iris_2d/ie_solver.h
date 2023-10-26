@@ -227,7 +227,7 @@ public:
 		ipopt_.SetOption("nlp_scaling_method", "gradient-based"); // how to solve nlp
 		ipopt_.SetOption("nlp_scaling_max_gradient", 1000.0); // how to solve nlp
 		ipopt_.SetOption("sb", "yes");
-
+		ipopt_.SetOption("accept_every_trial_step", "yes"); // yes: agressinve, no: conservative line serach
 	}
 	~IeSovler() {}
 

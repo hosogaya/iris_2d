@@ -71,10 +71,16 @@ bool Problem::separatingPlanes()
 
     for (size_t i=0; i<obs_.size(); ++i)
     {
+        bool is_divided = false;
         for (size_t j=0; j<planes.size(); ++j)
         {
-            if (((planes[j].first.transpose()*obs_[i]).array() - planes[j].second > 0.0).all()) continue;
+            if (((planes[j].first.transpose()*obs_[i]).array() - planes[j].second > 0.0).all()) 
+            {
+                is_divided = true;
+                break;
+            }
         }
+        if (is_divided) continue;
         Vector y_star;
         if (obs_[i].cols() == 2) 
         {
