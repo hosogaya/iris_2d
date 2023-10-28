@@ -218,7 +218,7 @@ public:
 		ipopt_.SetOption("max_iter", 50); // max iteration
 		ipopt_.SetOption("max_wall_time", 1); // maximum computation time
 		ipopt_.SetOption("constr_viol_tol", 0.001); // constraint violation tolerance
-		ipopt_.SetOption("print_level", 4); // supress log
+		ipopt_.SetOption("print_level", 0); // supress log
 
 		ipopt_.SetOption("dependency_detection_with_rhs", "no"); // check constrains (yes) or only check gradients of constraints (no).
 		ipopt_.SetOption("jacobian_approximation", "exact"); // how to compute jacobian

@@ -59,17 +59,17 @@ bool Problem::separatingPlanes()
         img_obs[i] = Cinv*(obs_[i].colwise() - getD()); 
     }
 
-    // std::vector<Vector> image_squared_dists(obs_.size());
-    // for (size_t i=0; i<obs_.size(); ++i) image_squared_dists[i] = img_obs[i].colwise().squaredNorm();
+    std::vector<Vector> image_squared_dists(obs_.size());
+    for (size_t i=0; i<obs_.size(); ++i) image_squared_dists[i] = img_obs[i].colwise().squaredNorm();
 
-    // std::vector<double> min_squared_dists(obs_.size());
-    // for (size_t i=0; i<obs_.size(); ++i) min_squared_dists[i] = image_squared_dists[i].minCoeff();
+    std::vector<double> min_squared_dists(obs_.size());
+    for (size_t i=0; i<obs_.size(); ++i) min_squared_dists[i] = image_squared_dists[i].minCoeff();
 
-    // std::vector<size_t> obs_sort_idx = arg_sort(min_squared_dists);
+    std::vector<size_t> obs_sort_idx = arg_sort(min_squared_dists);
 
     std::vector<HyperPlane> planes(0);
 
-    for (size_t i=0; i<obs_.size(); ++i)
+    for (const auto i: obs_sort_idx)
     {
         bool is_divided = false;
         for (size_t j=0; j<planes.size(); ++j)
