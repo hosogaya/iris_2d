@@ -259,7 +259,7 @@ public:
 		Eigen::VectorXd x(dim_+1+dim_);
 		x(0) = eigen_value(frist);
 		x(1) = eigen_value(second);
-		x(2) = eigen_value(rad);
+		x(2) = rad;
 		for (int i=0; i<dim_; ++i) x(dim_+1 + i) = d(i);
 		vars_ = std::make_shared<Variables>(dim_);
 		vars_->SetVariables(x);
